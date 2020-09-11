@@ -1,6 +1,6 @@
 import pytz
 import dateparser
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class TimeConverter:
@@ -15,7 +15,7 @@ class TimeConverter:
     @staticmethod
     def interval_to_ms(interval):
 
-        if not isinstance(interval, str) :
+        if not isinstance(interval, str):
             raise ValueError('Interval should be string')
 
         if len(interval) == 0:
@@ -49,7 +49,9 @@ class TimeConverter:
 
         return int((d - epoch).total_seconds() * TimeConverter.ms_per_second)
 
-
+    @staticmethod
+    def ms_to_datetime(ms):
+        return datetime.fromtimestamp(ms / TimeConverter.ms_per_second, tz=timezone.utc)
 
 
 if __name__ == '__main__':
