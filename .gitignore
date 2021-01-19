@@ -1,3 +1,5 @@
 env/
 const/
 .ipynb_checkpoints/
+__pycache__/
+.pyc
