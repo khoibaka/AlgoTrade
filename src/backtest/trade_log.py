@@ -1,77 +1,42 @@
 import pandas as pd
 from src.data.io import Load
 
+
 class TradeLog:
 
-    def __init__(self, starting_budget):
+    def __init__(self):
         self.__history_market_data = pd.DataFrame(columns=['Open time', 'Open', 'High', 'Low', 'Close',
                                                            'Volume', 'Close time', 'Quote asset volume',
                                                            'Number of trades', 'Taker buy base asset volume',
                                                            'Taker buy quote asset volume'])
-        self.__trade_log = []
-        self.__starting_budget = starting_budget
-        self.__current_budget = starting_budget
-        self.__current_crypto = 0
+        self.__history_market_data.set_index('Open time', inplace=True)
+        self.__accounts = []
+        self.__actions = []
 
-    def log(self, market_data, action):
-        self.__history_market_data = self.__history_market_data.append(market_data, ignore_index=True)
-        if action['type'] == "buy":
-            self.__current_budget -= market_data['Close'] * action['amount']
-            self.__current_crypto += action['amount']
-            self.__trade_log.append({
-                'action': action,
-                'budget': self.__current_budget,
-                'crypto': self.__current_crypto,
-                'value': self.get_current_value(),
-            })
-        elif action['type'] == "sell":
-            self.__current_budget += market_data['Close'] * action['amount']
-            self.__current_crypto -= action['amount']
-            self.__trade_log.append({
-                'action': action,
-                'budget': self.__current_budget,
-                'crypto': self.__current_crypto,
-                'value': self.get_current_value(),
-            })
-    def get_current_budget(self):
-        return self.__current_budget
+    def log(self, market_data, action, account):
+        self.__history_market_data.loc[market_data.name] = market_data.to_dict(
+        )
+        self.__accounts.append(account.get_account(market_data['Close']))
+        self.__actions.append(action)
 
-    def get_current_crypto(self):
-        return self.__current_crypto
+    def get_log_at_index(self, index):
+        return {}
 
-    def get_current_value(self):
-        print(self.__history_market_data)
-        total_money = self.__current_budget + self.__current_crypto * self.__history_market_data.iloc[-1, 4]
-        total_crypto = self.__current_budget / self.__history_market_data.iloc[-1, 4] + self.__current_crypto
-        return {
-            'budget': total_money,
-            'crypto': total_crypto,
-            'percent_change': (total_money - self.__starting_budget) * 100 / self.__starting_budget
-        }
+    def get_accounts(self):
+        return self.__accounts
 
-    def get_trade_log(self):
-        return self.__trade_log
+    def get_account_values(self):
+        return [item['value'] for item in self.__accounts]
+
+    def get_history_market_data(self):
+        return self.__history_market_data
+
+    def get_actions(self):
+        return self.__actions
+
+    def length(self):
+        return len(self.__actions)
+
 
 if __name__ == '__main__':
-    log = TradeLog(10000)
-    action = {
-        'type': 'buy',
-        'amount': 100
-    }
-    data = Load.load_file('F:\Projects\AlgoTradeStorage\CSV\BNBUSDT_11-06-17_08-17-20_1d.csv')
-    for i in range(10):
-        if i % 2 == 0:
-            log.log(data.iloc[i, :],{
-                'type': 'buy',
-                'amount': 1000
-            })
-        else:
-            log.log(data.iloc[i, :], {
-                'type': 'sell',
-                'amount': 1000
-            })
-
-    print(log.get_current_crypto())
-    print(log.get_current_budget())
-    for data_log in log.get_trade_log():
-        print(data_log)
+    pass

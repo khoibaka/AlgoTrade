@@ -3,3 +3,5 @@ const/
 .ipynb_checkpoints/
 __pycache__/
 .pyc
+.idea/
+.vscode/
