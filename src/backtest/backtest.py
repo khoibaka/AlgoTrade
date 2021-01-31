@@ -25,7 +25,7 @@ class BackTest:
             self.data_frame, start_time=start_time, end_time=end_time)
 
         account = Account(starting_budget=self.__starting_account)
-        trade_log = TradeLog()
+        trade_log = TradeLog(strategy.get_statistics_uses())
         while not data.isEmpty():
             market_data = data.next()
             if strategy:

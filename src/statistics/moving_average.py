@@ -5,15 +5,23 @@ from src.data.io import Load
 class MovingAverage(BaseStatistics):
 
     def __init__(self, window):
-        self.window = window
+        self.__window = window
 
     def get_name(self):
-        return f'{self.window} Moving Average'
+        return f'{self.__window} Moving Average'
 
     def calculate_row(self, dataframe, row_index):
+        if row_index > len(dataframe.index):
+            return None
         row_index = row_index % len(dataframe.index)
-        dataframe.iloc[row_index, df.columns.get_loc(
-            self.get_name())] = dataframe.iloc[row_index - self.window + 1: row_index + 1, df.columns.get_loc('Close')].mean()
+        if self.__window > row_index + 1:
+            ma = float('nan')
+        else:
+            ma = dataframe.iloc[row_index - self.__window +
+                                1: row_index + 1, dataframe.columns.get_loc('Close')].mean()
+
+        dataframe.iloc[row_index, dataframe.columns.get_loc(
+            self.get_name())] = ma
         return dataframe
 
     def calculate_all(self, dataframe):
